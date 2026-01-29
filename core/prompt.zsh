@@ -15,7 +15,7 @@ __git_branch() {
 
 # Function to get git status indicator
 __git_status() {
-    local status=""
+    local git_status=""
 
     # Check if we're in a git repo
     if ! git rev-parse --git-dir > /dev/null 2>&1; then
@@ -24,15 +24,15 @@ __git_status() {
 
     # Check for uncommitted changes
     if ! git diff --quiet 2>/dev/null; then
-        status="*"
+        git_status="*"
     fi
 
     # Check for staged changes
     if ! git diff --cached --quiet 2>/dev/null; then
-        status="${status}+"
+        git_status="${git_status}+"
     fi
 
-    echo "$status"
+    echo "$git_status"
 }
 
 # Function to truncate directory path
@@ -83,9 +83,9 @@ __build_prompt() {
     local git_info=""
     local branch=$(__git_branch)
     if [ -n "$branch" ]; then
-        local status=$(__git_status)
-        if [ -n "$status" ]; then
-            git_info=" ${gray}on${reset} ${yellow}${branch}${status}${reset}"
+        local git_status=$(__git_status)
+        if [ -n "$git_status" ]; then
+            git_info=" ${gray}on${reset} ${yellow}${branch}${git_status}${reset}"
         else
             git_info=" ${gray}on${reset} ${green}${branch}${reset}"
         fi
@@ -106,6 +106,18 @@ __build_prompt() {
 ${gray}╰─${reset}${prompt_char} "
 }
 
-# Set precmd to build prompt before each command
+# Track if this is the first prompt
+typeset -g __prompt_first_run=1
+
+# Add spacing between prompts (but not on first prompt)
+__add_prompt_spacing() {
+    if [ $__prompt_first_run -eq 0 ]; then
+        echo
+    fi
+    __prompt_first_run=0
+}
+
+# Set precmd hooks
 autoload -Uz add-zsh-hook
+add-zsh-hook precmd __add_prompt_spacing
 add-zsh-hook precmd __build_prompt
