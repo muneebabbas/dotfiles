@@ -1,0 +1,21 @@
+# Machine-specific zsh configuration
+# This file is not tracked by git
+
+# Example: Machine-specific aliases
+# alias deploy='ssh user@production'
+# alias work='cd ~/projects/work'
+
+# Example: Machine-specific PATH
+# export PATH="$HOME/custom/bin:$PATH"
+
+# Example: Machine-specific environment variables
+# export EDITOR="vim"
+# export PROJECT_DIR="$HOME/work"
+
+# Example: Load work-specific config
+# [ -f ~/.work_profile ] && source ~/.work_profile
+
+# Example: Add custom functions
+# myfunc() {
+#     echo "Custom function"
+# }

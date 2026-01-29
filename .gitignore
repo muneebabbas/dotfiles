@@ -1,0 +1,20 @@
+# Ignore local machine-specific configs
+local/zshrc_local
+local/*.local
+
+# Ignore vim swap files
+*.swp
+*.swo
+*~
+
+# Ignore backup files
+*.backup
+.*.backup
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore shell history
+.bash_history
+.zsh_history

@@ -1,0 +1,32 @@
+# Core dotfiles configuration
+# This file sources all core zsh configuration modules
+
+# Load keybindings and completion
+[ -f ~/.dotfiles/core/keybindings.zsh ] && source ~/.dotfiles/core/keybindings.zsh
+
+# Load prompt
+[ -f ~/.dotfiles/core/prompt.zsh ] && source ~/.dotfiles/core/prompt.zsh
+
+# Load history settings
+[ -f ~/.dotfiles/core/history.zsh ] && source ~/.dotfiles/core/history.zsh
+
+# Load aliases
+[ -f ~/.dotfiles/core/aliases.zsh ] && source ~/.dotfiles/core/aliases.zsh
+
+# Load FZF and Zoxide if available
+[ -f ~/.dotfiles/core/fzf.zsh ] && source ~/.dotfiles/core/fzf.zsh
+
+# Load zsh-autosuggestions if installed
+if [ -d ~/.zsh/zsh-autosuggestions ]; then
+    source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
+
+# Load zsh-syntax-highlighting if installed (must be last)
+if [ -d ~/.zsh/zsh-syntax-highlighting ]; then
+    source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
+
+# Load full features if enabled
+if [ -f ~/.dotfiles/full/zshrc_full ]; then
+    source ~/.dotfiles/full/zshrc_full
+fi

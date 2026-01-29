@@ -1,0 +1,18 @@
+# Full feature set configuration
+# This file is sourced by core/zshrc when it exists
+
+# Add advanced features here
+# Examples:
+# - Custom completion scripts
+# - Advanced shell functions
+# - Project-specific tools
+# - Development environment setups
+
+# Example: Load custom completion
+# fpath=(~/.dotfiles/full/completions $fpath)
+# autoload -Uz compinit && compinit
+
+# Example: Load development tools
+# if command -v pyenv &> /dev/null; then
+#     eval "$(pyenv init -)"
+# fi
