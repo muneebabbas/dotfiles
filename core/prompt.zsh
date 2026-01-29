@@ -164,18 +164,15 @@ __prompt_transient() {
     PROMPT="${prompt_char} "
 }
 
-# ZLE widget to handle transient prompt on line accept
-__prompt_accept_line() {
-    # Set to transient prompt before accepting line
+# ZLE widget to handle transient prompt on line finish
+__prompt_line_finish() {
+    # Set to transient prompt when line is finished
     __prompt_transient
     zle reset-prompt
-
-    # Accept the line (execute command)
-    zle .accept-line
 }
 
-# Set up ZLE widget
-zle -N accept-line __prompt_accept_line
+# Set up ZLE widget for line finish (cleaner than overriding accept-line)
+zle -N zle-line-finish __prompt_line_finish
 
 # Set precmd hooks
 autoload -Uz add-zsh-hook
