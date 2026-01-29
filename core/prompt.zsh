@@ -150,6 +150,42 @@ __add_prompt_spacing() {
     __prompt_first_run=0
 }
 
+# Transient prompt support
+# This makes old prompts collapse to just ❯ after execution
+
+# Function to set transient (simplified) prompt
+__prompt_transient() {
+    local exit_code=$?
+
+    # Colors
+    local reset='%f%b'
+    local green='%F{green}'
+    local red='%F{red}'
+
+    # Prompt character based on exit code
+    local prompt_char
+    if [ $exit_code -eq 0 ]; then
+        prompt_char="${green}❯${reset}"
+    else
+        prompt_char="${red}❯${reset}"
+    fi
+
+    PROMPT="${prompt_char} "
+}
+
+# ZLE widget to handle transient prompt on line accept
+__prompt_accept_line() {
+    # Set to transient prompt before accepting line
+    __prompt_transient
+    zle reset-prompt
+
+    # Accept the line (execute command)
+    zle .accept-line
+}
+
+# Set up ZLE widget
+zle -N accept-line __prompt_accept_line
+
 # Set precmd hooks
 autoload -Uz add-zsh-hook
 add-zsh-hook precmd __add_prompt_spacing
