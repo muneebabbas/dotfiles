@@ -100,6 +100,15 @@ install_zsh_plugins() {
     local plugin_dir="$HOME/.zsh"
     mkdir -p "$plugin_dir"
 
+    # Install fzf-tab
+    if [ ! -d "$plugin_dir/fzf-tab" ]; then
+        print_info "Installing fzf-tab..."
+        git clone --depth 1 https://github.com/Aloxaf/fzf-tab "$plugin_dir/fzf-tab"
+        print_success "fzf-tab installed"
+    else
+        print_success "fzf-tab already installed"
+    fi
+
     # Install zsh-autosuggestions
     if [ ! -d "$plugin_dir/zsh-autosuggestions" ]; then
         print_info "Installing zsh-autosuggestions..."

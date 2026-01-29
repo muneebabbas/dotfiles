@@ -183,7 +183,7 @@ print_next_steps() {
     echo "  • Useful aliases (ll, la, ..., etc.)"
 
     if [ "$INSTALL_CORE_TOOLS" = true ]; then
-        echo "  • Zsh with plugins (autosuggestions, syntax highlighting)"
+        echo "  • Zsh with plugins (fzf-tab, autosuggestions, syntax highlighting)"
         echo "  • FZF fuzzy finder (Ctrl+R, Ctrl+T, Alt+C)"
         echo "  • Zoxide smart directory jumping"
     fi

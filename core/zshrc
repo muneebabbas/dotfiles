@@ -4,6 +4,11 @@
 # Load keybindings and completion
 [ -f ~/.dotfiles/core/keybindings.zsh ] && source ~/.dotfiles/core/keybindings.zsh
 
+# Load fzf-tab if installed (must be after compinit, before other plugins)
+if [ -d ~/.zsh/fzf-tab ]; then
+    source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
+fi
+
 # Load prompt
 [ -f ~/.dotfiles/core/prompt.zsh ] && source ~/.dotfiles/core/prompt.zsh
 
