@@ -132,22 +132,13 @@ __build_prompt() {
         prompt_char="${red}❯${reset}"
     fi
 
-    # Build final two-line prompt
+    # Build final two-line prompt with newline before it
+    # Blank line for spacing
     # Line 1: ╭─ user@host in ~/path on branch
     # Line 2: ╰─❯
-    PROMPT="${gray}╭─${reset} ${user_host} ${gray}in${reset} ${dir}${git_info}
+    PROMPT="
+${gray}╭─${reset} ${user_host} ${gray}in${reset} ${dir}${git_info}
 ${gray}╰─${reset}${prompt_char} "
-}
-
-# Track if this is the first prompt
-typeset -g __prompt_first_run=1
-
-# Add spacing between prompts (but not on first prompt)
-__add_prompt_spacing() {
-    if [ $__prompt_first_run -eq 0 ]; then
-        echo
-    fi
-    __prompt_first_run=0
 }
 
 # Transient prompt support
@@ -188,5 +179,4 @@ zle -N accept-line __prompt_accept_line
 
 # Set precmd hooks
 autoload -Uz add-zsh-hook
-add-zsh-hook precmd __add_prompt_spacing
 add-zsh-hook precmd __build_prompt
