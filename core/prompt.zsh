@@ -22,17 +22,38 @@ __git_status() {
         return
     fi
 
-    # Check for uncommitted changes
-    if ! git diff --quiet 2>/dev/null; then
+    # Check for any changes (working or staged)
+    if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
         git_status="*"
     fi
 
-    # Check for staged changes
-    if ! git diff --cached --quiet 2>/dev/null; then
-        git_status="${git_status}+"
+    echo "$git_status"
+}
+
+# Function to get remote tracking status
+__git_remote_status() {
+    local remote_status=""
+
+    # Check if we're in a git repo
+    if ! git rev-parse --git-dir > /dev/null 2>&1; then
+        return
     fi
 
-    echo "$git_status"
+    # Get ahead/behind counts
+    local ahead behind
+    ahead=$(git rev-list --count @{upstream}..HEAD 2>/dev/null)
+    behind=$(git rev-list --count HEAD..@{upstream} 2>/dev/null)
+
+    # Add indicators
+    if [ -n "$ahead" ] && [ "$ahead" -gt 0 ]; then
+        remote_status="${remote_status}⇡"
+    fi
+
+    if [ -n "$behind" ] && [ "$behind" -gt 0 ]; then
+        remote_status="${remote_status}⇣"
+    fi
+
+    echo "$remote_status"
 }
 
 # Function to truncate directory path
@@ -84,10 +105,22 @@ __build_prompt() {
     local branch=$(__git_branch)
     if [ -n "$branch" ]; then
         local git_status=$(__git_status)
+        local remote_status=$(__git_remote_status)
+
+        # Determine branch color (yellow if dirty, green if clean)
+        local branch_color
         if [ -n "$git_status" ]; then
-            git_info=" ${gray}on${reset} ${yellow}${branch}${git_status}${reset}"
+            branch_color="${yellow}"
         else
-            git_info=" ${gray}on${reset} ${green}${branch}${reset}"
+            branch_color="${green}"
+        fi
+
+        # Build git info: branch* ⇡⇣
+        git_info=" ${gray}on${reset} ${branch_color}${branch}${git_status}${reset}"
+
+        # Add remote status with spacing if present
+        if [ -n "$remote_status" ]; then
+            git_info="${git_info} ${cyan}${remote_status}${reset}"
         fi
     fi
 
