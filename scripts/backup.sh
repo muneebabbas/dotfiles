@@ -57,11 +57,6 @@ main() {
         files_backed_up=$((files_backed_up + 1))
     fi
 
-    # Backup .zprofile if exists
-    if backup_file "$HOME/.zprofile"; then
-        files_backed_up=$((files_backed_up + 1))
-    fi
-
     if [ $files_backed_up -eq 0 ]; then
         print_info "No existing dotfiles found to backup"
     else

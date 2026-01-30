@@ -40,6 +40,7 @@ __git_prompt_info() {
 }
 
 # Function to truncate directory path
+# Set TRUNCATE_PROMPT=1 in local/zshrc_local to enable truncation
 __truncate_path() {
     local path="$PWD"
     local home="$HOME"
@@ -47,17 +48,23 @@ __truncate_path() {
     # Replace home with ~
     path="${path/#$home/~}"
 
+    # If truncation disabled (default), return full path
+    if [[ "${TRUNCATE_PROMPT:-0}" != "1" ]]; then
+        echo "$path"
+        return
+    fi
+
     # If path has more than 2 levels, truncate
     local -a parts
     parts=("${(@s:/:)path}")
     local count=${#parts[@]}
 
     if [ $count -gt 3 ]; then
-        # Show first part (~ or /) and last 2 parts
+        # Show first part (~ or /) and last 2 parts with …/ to indicate truncation
         if [ "${parts[1]}" = "~" ]; then
-            echo "~/${parts[-2]}/${parts[-1]}"
+            echo "~/…/${parts[-2]}/${parts[-1]}"
         else
-            echo "/${parts[-2]}/${parts[-1]}"
+            echo "/…/${parts[-2]}/${parts[-1]}"
         fi
     else
         echo "$path"

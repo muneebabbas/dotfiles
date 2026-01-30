@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Dotfiles installation script
-# Usage: ./install.sh [--core-tools] [--full]
+# Usage: ./install.sh [--core-tools]
 
 set -e
 
@@ -17,7 +17,6 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Parse command line arguments
 INSTALL_CORE_TOOLS=false
-ENABLE_FULL=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -25,16 +24,11 @@ while [[ $# -gt 0 ]]; do
             INSTALL_CORE_TOOLS=true
             shift
             ;;
-        --full)
-            ENABLE_FULL=true
-            shift
-            ;;
         -h|--help)
             echo "Usage: $0 [OPTIONS]"
             echo ""
             echo "Options:"
             echo "  --core-tools    Install zsh, fzf, zoxide, and plugins"
-            echo "  --full          Enable full feature set"
             echo "  -h, --help      Show this help message"
             exit 0
             ;;
@@ -67,20 +61,48 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Backup existing dotfiles
-backup_dotfiles() {
-    print_header "Backing up existing dotfiles"
+# Migrate existing .zshrc to local config
+migrate_existing_zshrc() {
+    print_header "Checking for existing .zshrc"
 
-    # Check if .zshrc already sources dotfiles (don't backup our own config)
+    # Check if .zshrc already sources dotfiles (don't migrate our own config)
     if [ -f "$HOME/.zshrc" ] && grep -q "~/.dotfiles/core/zshrc" "$HOME/.zshrc"; then
-        print_info "Already using dotfiles, skipping backup"
+        print_info "Already using dotfiles, skipping migration"
         return 0
     fi
 
     if [ -f "$HOME/.zshrc" ]; then
+        # Backup to /tmp first
         "$DOTFILES_DIR/scripts/backup.sh"
+
+        # Migrate to local/zshrc_local
+        local local_config="$DOTFILES_DIR/local/zshrc_local"
+
+        if [ -f "$local_config" ]; then
+            # Append to existing local config
+            echo "" >> "$local_config"
+            echo "# === Migrated from existing ~/.zshrc ===" >> "$local_config"
+            cat "$HOME/.zshrc" >> "$local_config"
+            print_success "Appended existing .zshrc to local/zshrc_local"
+        else
+            # Create new local config from existing .zshrc
+            echo "# Machine-specific zsh configuration" > "$local_config"
+            echo "# Migrated from existing ~/.zshrc" >> "$local_config"
+            echo "" >> "$local_config"
+            cat "$HOME/.zshrc" >> "$local_config"
+            print_success "Migrated existing .zshrc to local/zshrc_local"
+        fi
+
+        echo ""
+        print_warning "Please review ~/.dotfiles/local/zshrc_local"
+        print_warning "Remove any settings that conflict with core dotfiles:"
+        print_warning "  - Prompt configuration (PS1, PROMPT)"
+        print_warning "  - History settings (HISTSIZE, HISTFILE, etc.)"
+        print_warning "  - Keybindings that may conflict"
+        echo ""
+        read -p "Press Enter to continue after reviewing, or Ctrl+C to abort..."
     else
-        print_info "No existing .zshrc found, skipping backup"
+        print_info "No existing .zshrc found"
     fi
 }
 
@@ -137,14 +159,6 @@ install_core_tools() {
     fi
 }
 
-# Enable full features
-enable_full_features() {
-    if [ "$ENABLE_FULL" = true ]; then
-        print_header "Enabling full features"
-        print_success "Full features are enabled"
-        print_info "Edit ~/.dotfiles/full/zshrc_full to add custom features"
-    fi
-}
 
 # Make scripts executable
 make_scripts_executable() {
@@ -207,10 +221,9 @@ main() {
 
     # Run installation steps
     make_scripts_executable
-    backup_dotfiles
+    migrate_existing_zshrc
     setup_local_config
     install_zshrc
-    enable_full_features
     install_core_tools
 
     # Show next steps

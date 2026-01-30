@@ -12,8 +12,7 @@ core/aliases.zsh    - Shell aliases
 core/keybindings.zsh - Zsh key bindings
 core/fzf.zsh        - Fzf integration and config
 core/history.zsh    - History settings
-local/zshrc_local   - Machine-specific config (gitignored)
-full/zshrc_full     - Extended config for full installs
+local/zshrc_local   - Machine-specific config (gitignored), migrated from existing ~/.zshrc
 scripts/setup-core.sh - Installs dependencies (zsh, fzf, starship, etc)
 scripts/detect-os.sh  - OS detection helper
 scripts/backup.sh     - Backup utility
@@ -26,8 +25,20 @@ scripts/backup.sh     - Backup utility
 - Yellow branch = dirty, green = clean
 - Arrows for ahead/behind remote
 - Transient prompt (collapses after command execution)
+- Path truncation with `…/` indicator (e.g., `~/…/bar/baz`)
 
 Key functions: `__git_prompt_info`, `__build_prompt`, `__truncate_path`
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `TRUNCATE_PROMPT` | `0` | Set to `1` to enable path truncation |
+
+Add to `local/zshrc_local` to customize:
+```zsh
+export TRUNCATE_PROMPT=1  # Enable truncated paths (e.g., ~/…/bar/baz)
+```
 
 ## Local Customization
 

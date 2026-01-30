@@ -12,6 +12,9 @@
 # export EDITOR="vim"
 # export PROJECT_DIR="$HOME/work"
 
+# Example: Prompt settings
+# export TRUNCATE_PROMPT=1  # Enable truncated paths (e.g., ~/…/bar/baz)
+
 # Example: Load work-specific config
 # [ -f ~/.work_profile ] && source ~/.work_profile
 

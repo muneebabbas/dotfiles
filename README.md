@@ -154,31 +154,6 @@ If you didn't use --core-tools during installation, you can install them later:
 bash ~/.dotfiles/scripts/setup-core.sh
 ```
 
-Or install manually:
-
-Zsh (Arch Linux):
-```bash
-sudo pacman -S zsh
-chsh -s $(which zsh)
-```
-
-FZF (Arch Linux):
-```bash
-sudo pacman -S fzf
-```
-
-Zoxide (Arch Linux):
-```bash
-sudo pacman -S zoxide
-```
-
-Zsh plugins:
-```bash
-mkdir -p ~/.zsh
-git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
-git clone https://github.com/zsh-users/zsh-syntax-highlighting ~/.zsh/zsh-syntax-highlighting
-```
-
 ## Uninstallation
 
 To uninstall:
@@ -203,64 +178,3 @@ exec zsh
 cd ~/.dotfiles
 git pull
 exec zsh
-```
-
-## Troubleshooting
-
-Prompt not showing colors:
-
-Make sure your terminal supports colors. Test with:
-```bash
-echo -e "\033[0;32mGreen\033[0m \033[0;34mBlue\033[0m \033[0;31mRed\033[0m"
-```
-
-Git branch not showing:
-
-Make sure you're in a git repository:
-```bash
-git status
-```
-
-FZF key bindings not working:
-
-FZF might not be installed or sourced correctly. Check:
-```bash
-which fzf
-```
-
-Reinstall with:
-```bash
-bash ~/.dotfiles/scripts/setup-core.sh
-```
-
-Zoxide not working:
-
-Make sure zoxide is installed:
-```bash
-which zoxide
-```
-
-After installing, reload your shell:
-```bash
-exec zsh
-```
-
-Autosuggestions not appearing:
-
-Make sure the plugin is installed:
-```bash
-ls ~/.zsh/zsh-autosuggestions
-```
-
-If not, run:
-```bash
-bash ~/.dotfiles/scripts/setup-core.sh
-```
-
-## Contributing
-
-This is a personal dotfiles repository, but feel free to fork and adapt it for your own use.
-
-## License
-
-MIT License - Feel free to use and modify as you wish.
