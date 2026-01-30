@@ -123,7 +123,11 @@ setup_local_config() {
 install_zshrc() {
     print_header "Installing .zshrc"
 
-    local zshrc_content='# Source dotfiles core config
+    # Atomic write using temp file
+    local tmp
+    tmp=$(mktemp)
+    cat > "$tmp" << 'EOF'
+# Source dotfiles core config
 if [ -f ~/.dotfiles/core/zshrc ]; then
     source ~/.dotfiles/core/zshrc
 fi
@@ -131,10 +135,9 @@ fi
 # Source machine-specific overrides
 if [ -f ~/.dotfiles/local/zshrc_local ]; then
     source ~/.dotfiles/local/zshrc_local
-fi'
-
-    # Always write .zshrc to ensure latest version
-    echo "$zshrc_content" > "$HOME/.zshrc"
+fi
+EOF
+    mv "$tmp" "$HOME/.zshrc"
     print_success "Installed .zshrc"
     print_info "Shell now sources from ~/.dotfiles/core/zshrc"
 }

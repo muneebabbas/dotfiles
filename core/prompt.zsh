@@ -7,7 +7,7 @@ setopt PROMPT_SUBST
 # Optimized git info - single command instead of 8+
 __git_prompt_info() {
     local git_output
-    git_output=$(git status --porcelain=v2 --branch 2>/dev/null) || return
+    git_output=$(GIT_OPTIONAL_LOCKS=0 git status --porcelain=v2 --branch 2>/dev/null) || return
 
     local branch="" ahead=0 behind=0 dirty=""
     local line
@@ -94,10 +94,10 @@ __build_prompt() {
     local git_info=""
     local git_data=$(__git_prompt_info)
     if [[ -n "$git_data" ]]; then
-        local branch="${git_data%%|*}"
-        local rest="${git_data#*|}"
-        local dirty="${rest%%|*}"
-        local remote_status="${rest#*|}"
+        # Parse with fallback for malformed output
+        local branch dirty remote_status
+        IFS='|' read -r branch dirty remote_status <<< "${git_data:-||}"
+        [[ -z "$branch" ]] && branch=""
 
         # Determine branch color (yellow if dirty, green if clean)
         local branch_color

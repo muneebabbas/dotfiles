@@ -8,8 +8,8 @@ HISTFILE=~/.zsh_history
 # Share history across all sessions
 setopt SHARE_HISTORY
 
-# Append to history file incrementally
-setopt INC_APPEND_HISTORY
+# Append to history when command finishes (avoids race with parallel sessions)
+setopt INC_APPEND_HISTORY_TIME
 
 # Don't record duplicate commands
 setopt HIST_IGNORE_DUPS
