@@ -65,7 +65,13 @@ print_error() {
 migrate_existing_zshrc() {
     print_header "Checking for existing .zshrc"
 
-    # Check if .zshrc already sources dotfiles (don't migrate our own config)
+    # Skip if already symlinked to our config
+    if is_zshrc_installed; then
+        print_info "Already using dotfiles, skipping migration"
+        return 0
+    fi
+
+    # Skip if it's our generated config (from older install)
     if [ -f "$HOME/.zshrc" ] && grep -q "~/.dotfiles/core/zshrc" "$HOME/.zshrc"; then
         print_info "Already using dotfiles, skipping migration"
         return 0
@@ -119,46 +125,40 @@ setup_local_config() {
     fi
 }
 
-# Install main .zshrc
+# Check if zshrc is already correctly symlinked
+is_zshrc_installed() {
+    [ -L "$HOME/.zshrc" ] && [ "$(readlink "$HOME/.zshrc")" = "$DOTFILES_DIR/core/zshrc" ]
+}
+
+# Install main .zshrc as symlink
 install_zshrc() {
     print_header "Installing .zshrc"
 
-    # Atomic write using temp file
-    local tmp
-    tmp=$(mktemp)
-    cat > "$tmp" << 'EOF'
-# Source dotfiles core config
-if [ -f ~/.dotfiles/core/zshrc ]; then
-    source ~/.dotfiles/core/zshrc
-fi
+    if is_zshrc_installed; then
+        print_info "~/.zshrc already symlinked correctly"
+        return 0
+    fi
 
-# Source machine-specific overrides
-if [ -f ~/.dotfiles/local/zshrc_local ]; then
-    source ~/.dotfiles/local/zshrc_local
-fi
-EOF
-    mv "$tmp" "$HOME/.zshrc"
-    print_success "Installed .zshrc"
-    print_info "Shell now sources from ~/.dotfiles/core/zshrc"
+    # Remove existing file/symlink if present (already backed up in migrate step)
+    if [ -e "$HOME/.zshrc" ] || [ -L "$HOME/.zshrc" ]; then
+        rm "$HOME/.zshrc"
+    fi
+
+    ln -s "$DOTFILES_DIR/core/zshrc" "$HOME/.zshrc"
+    print_success "Symlinked ~/.zshrc -> $DOTFILES_DIR/core/zshrc"
 }
 
 # Install core tools
 install_core_tools() {
     print_header "Installing core tools"
 
-    if [ "$INSTALL_CORE_TOOLS" = true ]; then
-        print_info "Running core tools installation..."
-        echo
+    print_info "Running core tools installation..."
+    echo
 
-        if [ -f "$DOTFILES_DIR/scripts/setup-core.sh" ]; then
-            bash "$DOTFILES_DIR/scripts/setup-core.sh"
-        else
-            print_error "setup-core.sh not found"
-        fi
+    if [ -f "$DOTFILES_DIR/scripts/setup-core.sh" ]; then
+        bash "$DOTFILES_DIR/scripts/setup-core.sh"
     else
-        print_info "Skipping core tools installation"
-        print_info "To install zsh, fzf, zoxide, and plugins later, run:"
-        print_info "  bash ~/.dotfiles/scripts/setup-core.sh"
+        print_error "setup-core.sh not found"
     fi
 }
 
@@ -222,14 +222,16 @@ main() {
     print_info "Installation directory: $DOTFILES_DIR"
     echo
 
-    # Run installation steps
+    # All steps are idempotent - safe to run multiple times
     make_scripts_executable
     migrate_existing_zshrc
     setup_local_config
     install_zshrc
-    install_core_tools
 
-    # Show next steps
+    if [ "$INSTALL_CORE_TOOLS" = true ]; then
+        install_core_tools
+    fi
+
     print_next_steps
 }
 

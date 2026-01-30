@@ -30,3 +30,6 @@ fi
 if [ -d ~/.zsh/zsh-syntax-highlighting ]; then
     source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
+
+# Load machine-specific local config (must be after everything else)
+[ -f ~/.dotfiles/local/zshrc_local ] && source ~/.dotfiles/local/zshrc_local
