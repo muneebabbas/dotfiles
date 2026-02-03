@@ -18,6 +18,9 @@ detect_os() {
             arch)
                 echo "arch"
                 ;;
+            nixos)
+                echo "nixos"
+                ;;
             *)
                 echo "unknown"
                 ;;

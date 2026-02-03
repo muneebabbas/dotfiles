@@ -232,8 +232,27 @@ install_zoxide_script() {
 # Main installation
 main() {
     print_info "Starting core tools installation"
-    print_info "Detected OS: $(detect_os)"
+    local os=$(detect_os)
+    print_info "Detected OS: $os"
     echo
+
+    # Handle NixOS specially
+    if [ "$os" = "nixos" ]; then
+        print_info "NixOS detected!"
+        echo
+        print_warning "This script is for traditional Linux distributions."
+        print_warning "On NixOS, use the Nix flake to manage zsh and plugins."
+        echo
+        print_info "To set up dotfiles on NixOS:"
+        print_info "  1. Clone dotfiles to ~/.dotfiles"
+        print_info "  2. Import the flake in /etc/nixos/configuration.nix"
+        print_info "  3. Enable for your user in configuration.nix"
+        print_info "  4. Run: sudo nixos-rebuild switch"
+        echo
+        print_info "See CLAUDE.md for detailed NixOS installation instructions."
+        echo
+        exit 0
+    fi
 
     # Setup sudo (determine if we need it and if it's available)
     setup_sudo

@@ -4,8 +4,17 @@
 # Load keybindings and completion
 [ -f ~/.dotfiles/core/keybindings.zsh ] && source ~/.dotfiles/core/keybindings.zsh
 
-# Load fzf-tab if installed (must be after compinit, before other plugins)
-if [ -d ~/.zsh/fzf-tab ]; then
+# Load fzf-tab plugin (Nix-managed or git-cloned)
+# On NixOS with flake: plugin is in fpath via programs.zsh.plugins
+# On traditional systems: plugin is git-cloned to ~/.zsh/fzf-tab
+if (( ${fpath[(I)*/fzf-tab*]} )); then
+    # Nix-managed: plugin is in fpath, find and source it
+    local fzf_tab_path="${fpath[(r)*/fzf-tab*]}"
+    if [ -f "$fzf_tab_path/fzf-tab.plugin.zsh" ]; then
+        source "$fzf_tab_path/fzf-tab.plugin.zsh"
+    fi
+elif [ -d ~/.zsh/fzf-tab ]; then
+    # Traditional: git-cloned version
     source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
 fi
 
@@ -21,15 +30,32 @@ fi
 # Load FZF and Zoxide if available
 [ -f ~/.dotfiles/core/fzf.zsh ] && source ~/.dotfiles/core/fzf.zsh
 
-# Load zsh-autosuggestions if installed
-if [ -d ~/.zsh/zsh-autosuggestions ]; then
+# Load zsh-autosuggestions (Nix-managed or git-cloned)
+if (( ${fpath[(I)*/zsh-autosuggestions*]} )); then
+    # Nix-managed: plugin is in fpath
+    local autosuggestions_path="${fpath[(r)*/zsh-autosuggestions*]}"
+    if [ -f "$autosuggestions_path/zsh-autosuggestions.zsh" ]; then
+        source "$autosuggestions_path/zsh-autosuggestions.zsh"
+    fi
+elif [ -d ~/.zsh/zsh-autosuggestions ]; then
+    # Traditional: git-cloned version
     source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
 
-# Load zsh-syntax-highlighting if installed (must be last)
-if [ -d ~/.zsh/zsh-syntax-highlighting ]; then
+# Load zsh-syntax-highlighting (Nix-managed or git-cloned) - must be last
+if (( ${fpath[(I)*/zsh-syntax-highlighting*]} )); then
+    # Nix-managed: plugin is in fpath
+    local syntax_path="${fpath[(r)*/zsh-syntax-highlighting*]}"
+    if [ -f "$syntax_path/zsh-syntax-highlighting.zsh" ]; then
+        source "$syntax_path/zsh-syntax-highlighting.zsh"
+    fi
+elif [ -d ~/.zsh/zsh-syntax-highlighting ]; then
+    # Traditional: git-cloned version
     source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
 
 # Load machine-specific local config (must be after everything else)
+# Traditional Linux with local clone: ~/.dotfiles/local/zshrc_local
+# NixOS declarative or other systems: ~/.zshrc.local
 [ -f ~/.dotfiles/local/zshrc_local ] && source ~/.dotfiles/local/zshrc_local
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local
