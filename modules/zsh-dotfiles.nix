@@ -124,34 +124,23 @@ in
       zoxide
       fd
       git
+      # Zsh plugins
+      zsh-fzf-tab
+      zsh-autosuggestions
+      zsh-syntax-highlighting
     ];
 
-    # Enable zsh globally and configure plugins
+    # Enable zsh globally
     programs.zsh = {
       enable = true;
 
-      # Add plugins from nixpkgs (available to all users via fpath)
-      plugins = [
-        {
-          name = "fzf-tab";
-          src = pkgs.zsh-fzf-tab;
-          file = "share/fzf-tab/fzf-tab.plugin.zsh";
-        }
-        {
-          name = "zsh-autosuggestions";
-          src = pkgs.zsh-autosuggestions;
-          file = "share/zsh-autosuggestions/zsh-autosuggestions.zsh";
-        }
-        {
-          name = "zsh-syntax-highlighting";
-          src = pkgs.zsh-syntax-highlighting;
-          file = "share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh";
-        }
-      ];
-
       # Don't set a default config - users will have their own via symlink
+      # Set up fpath to include plugin directories
       interactiveShellInit = ''
-        # Plugins are auto-loaded via fpath, dotfiles handle the rest
+        # Add plugin paths to fpath for detection by core/zshrc
+        fpath+=(${pkgs.zsh-fzf-tab}/share/fzf-tab)
+        fpath+=(${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions)
+        fpath+=(${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting)
       '';
     };
 
