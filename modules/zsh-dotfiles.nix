@@ -22,7 +22,6 @@ let
       elif [ "$(readlink ${homeDir}/.zshrc 2>/dev/null)" != "${zshrcPath}" ]; then
         rm -f ${homeDir}/.zshrc
         ln -sf ${zshrcPath} ${homeDir}/.zshrc
-        chown ${username}:users ${homeDir}/.zshrc
         echo "Created symlink: ${homeDir}/.zshrc -> ${zshrcPath}"
       fi
     '';
@@ -56,7 +55,6 @@ let
       else
         rm -f ${homeDir}/.zshrc
         ln -sf ${zshrcContent} ${homeDir}/.zshrc
-        chown ${username}:users ${homeDir}/.zshrc
         echo "Created declarative zshrc: ${homeDir}/.zshrc -> Nix store"
       fi
     '';
