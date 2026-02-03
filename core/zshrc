@@ -64,3 +64,6 @@ fi
 # NixOS declarative or other systems: ~/.zshrc.local
 [ -f ~/.dotfiles/local/zshrc_local ] && source ~/.dotfiles/local/zshrc_local
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
+
+# Ensure clean exit code for first prompt
+true
