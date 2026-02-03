@@ -1,8 +1,13 @@
 # Core dotfiles configuration
 # This file sources all core zsh configuration modules
 
+# Determine the core directory location
+# In declarative mode: files are sourced from Nix store
+# In local clone mode: files are in ~/.dotfiles/core/
+CORE_DIR="${${(%):-%x}:A:h}"
+
 # Load keybindings and completion
-[ -f ~/.dotfiles/core/keybindings.zsh ] && source ~/.dotfiles/core/keybindings.zsh
+[ -f "$CORE_DIR/keybindings.zsh" ] && source "$CORE_DIR/keybindings.zsh"
 
 # Load fzf-tab plugin (Nix-managed or git-cloned)
 # On NixOS with flake: plugin is in fpath via programs.zsh.plugins
@@ -19,16 +24,16 @@ elif [ -d ~/.zsh/fzf-tab ]; then
 fi
 
 # Load prompt
-[ -f ~/.dotfiles/core/prompt.zsh ] && source ~/.dotfiles/core/prompt.zsh
+[ -f "$CORE_DIR/prompt.zsh" ] && source "$CORE_DIR/prompt.zsh"
 
 # Load history settings
-[ -f ~/.dotfiles/core/history.zsh ] && source ~/.dotfiles/core/history.zsh
+[ -f "$CORE_DIR/history.zsh" ] && source "$CORE_DIR/history.zsh"
 
 # Load aliases
-[ -f ~/.dotfiles/core/aliases.zsh ] && source ~/.dotfiles/core/aliases.zsh
+[ -f "$CORE_DIR/aliases.zsh" ] && source "$CORE_DIR/aliases.zsh"
 
 # Load FZF and Zoxide if available
-[ -f ~/.dotfiles/core/fzf.zsh ] && source ~/.dotfiles/core/fzf.zsh
+[ -f "$CORE_DIR/fzf.zsh" ] && source "$CORE_DIR/fzf.zsh"
 
 # Load zsh-autosuggestions (Nix-managed or git-cloned)
 if (( ${fpath[(I)*/zsh-autosuggestions*]} )); then
