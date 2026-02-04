@@ -74,7 +74,6 @@ For live editing on NixOS, use `install.sh` instead (it works on NixOS too).
         {
           programs.zsh-dotfiles = {
             enable = true;
-            dotfilesSource = dotfiles;  # Pass the flake input
             users.yourusername = {
               enable = true;
 
@@ -132,7 +131,6 @@ This is equivalent to `git pull` on traditional systems.
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `enable` | bool | false | Enable the zsh-dotfiles module |
-| `dotfilesSource` | path | (required) | The flake input for dotfiles |
 | `users.<name>.enable` | bool | false | Enable dotfiles for this user |
 | `users.<name>.extraConfig` | lines | "" | NixOS-specific zsh config (loaded after dotfiles, before ~/.zshrc.local) |
 

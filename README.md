@@ -52,7 +52,6 @@ Add to your `/etc/nixos/flake.nix`:
         {
           programs.zsh-dotfiles = {
             enable = true;
-            dotfilesSource = dotfiles;
             users.yourusername.enable = true;
           };
         }

@@ -13,8 +13,8 @@
     in
     {
       # NixOS module for user-specific zsh dotfiles
-      # Uses standard module signature - dotfilesSource is passed as an option
-      nixosModules.default = ./modules/zsh-dotfiles.nix;
+      # Pass self so module can reference dotfiles from Nix store automatically
+      nixosModules.default = import ./modules/zsh-dotfiles.nix { dotfilesSource = self; };
 
       # Formatter for nix fmt (available on all supported systems)
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixpkgs-fmt);
