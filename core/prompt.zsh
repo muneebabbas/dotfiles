@@ -4,6 +4,9 @@
 # Enable prompt substitution
 setopt PROMPT_SUBST
 
+# Load datetime module for EPOCHSECONDS (command timing)
+zmodload zsh/datetime 2>/dev/null
+
 # Optimized git info - single command instead of 8+
 __git_prompt_info() {
     local git_output
@@ -69,6 +72,55 @@ __truncate_path() {
     else
         echo "$path"
     fi
+}
+
+# Capture command start time
+__prompt_preexec() {
+    __prompt_cmd_start=$EPOCHREALTIME
+}
+
+# Calculate elapsed time after command execution
+__prompt_precmd() {
+    if [[ -n $__prompt_cmd_start ]]; then
+        __prompt_cmd_elapsed=$((EPOCHREALTIME - __prompt_cmd_start))
+        unset __prompt_cmd_start
+    else
+        __prompt_cmd_elapsed=0
+    fi
+}
+
+# Build right-side prompt
+__build_rprompt() {
+    # Colors
+    local reset='%f%b'
+    local cyan='%F{cyan}'
+    local gray='%F{240}'
+
+    local rprompt_parts=()
+
+    # Execution time (only if >= threshold, default 1 second)
+    local threshold="${CMD_TIME_THRESHOLD:-1}"
+    if [[ ${SHOW_CMD_TIME:-1} -eq 1 ]] && [[ ${__prompt_cmd_elapsed:-0} -ge $threshold ]]; then
+        local elapsed=${__prompt_cmd_elapsed}
+        if [[ $elapsed -ge 60 ]]; then
+            # For times >= 60s, show as "1m30s" (no decimals)
+            local mins=$((${elapsed%.*} / 60))
+            local secs=$((${elapsed%.*} % 60))
+            rprompt_parts+=("${gray}${mins}m${secs}s${reset}")
+        else
+            # For times < 60s, show with 1 decimal place "2.5s"
+            local formatted_time=$(printf "%.1f" $elapsed)
+            rprompt_parts+=("${gray}${formatted_time}s${reset}")
+        fi
+    fi
+
+    # Current time (HH:MM format)
+    if [[ ${SHOW_CLOCK:-1} -eq 1 ]]; then
+        rprompt_parts+=("${cyan}%T${reset}")
+    fi
+
+    # Join parts with double space separator
+    RPROMPT="${(j:  :)rprompt_parts}"
 }
 
 # Build the prompt
@@ -154,6 +206,7 @@ __prompt_transient() {
     fi
 
     PROMPT="${prompt_char} "
+    RPROMPT=""  # Clear right prompt in transient mode
 }
 
 # ZLE widget to handle transient prompt on line finish
@@ -166,6 +219,9 @@ __prompt_line_finish() {
 # Set up ZLE widget for line finish (cleaner than overriding accept-line)
 zle -N zle-line-finish __prompt_line_finish
 
-# Set precmd hooks
+# Set precmd and preexec hooks
 autoload -Uz add-zsh-hook
-add-zsh-hook precmd __build_prompt
+add-zsh-hook preexec __prompt_preexec    # Track command start time
+add-zsh-hook precmd __prompt_precmd      # Calculate elapsed time
+add-zsh-hook precmd __build_prompt       # Build left prompt
+add-zsh-hook precmd __build_rprompt      # Build right prompt
