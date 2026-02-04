@@ -119,8 +119,10 @@ in
       enable = true;
 
       # interactiveShellInit runs for all interactive zsh sessions
-      # We add plugin directories to fpath so core/zshrc can detect them
       interactiveShellInit = ''
+        # Set FZF_BASE for core/fzf.zsh to find key bindings and completion
+        export FZF_BASE="${pkgs.fzf}/share/fzf"
+
         # Add plugin paths to fpath for detection by core/zshrc
         # The core/zshrc checks fpath to determine if plugins are available
         fpath+=(${pkgs.zsh-fzf-tab}/share/fzf-tab)

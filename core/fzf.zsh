@@ -12,20 +12,25 @@ if command -v fzf &>/dev/null; then
         export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
     fi
 
-    # Source FZF key bindings if available
-    if [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
-        source /usr/share/doc/fzf/examples/key-bindings.zsh
+    # Source FZF key bindings
+    # Priority: $FZF_BASE (set by NixOS/package managers) > common system paths > manual install
+    if [[ -n "$FZF_BASE" && -f "$FZF_BASE/key-bindings.zsh" ]]; then
+        source "$FZF_BASE/key-bindings.zsh"
     elif [[ -f /usr/share/fzf/key-bindings.zsh ]]; then
         source /usr/share/fzf/key-bindings.zsh
+    elif [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
+        source /usr/share/doc/fzf/examples/key-bindings.zsh
     elif [[ -f ~/.fzf/shell/key-bindings.zsh ]]; then
         source ~/.fzf/shell/key-bindings.zsh
     fi
 
-    # Source FZF completion if available
-    if [[ -f /usr/share/doc/fzf/examples/completion.zsh ]]; then
-        source /usr/share/doc/fzf/examples/completion.zsh
+    # Source FZF completion
+    if [[ -n "$FZF_BASE" && -f "$FZF_BASE/completion.zsh" ]]; then
+        source "$FZF_BASE/completion.zsh"
     elif [[ -f /usr/share/fzf/completion.zsh ]]; then
         source /usr/share/fzf/completion.zsh
+    elif [[ -f /usr/share/doc/fzf/examples/completion.zsh ]]; then
+        source /usr/share/doc/fzf/examples/completion.zsh
     elif [[ -f ~/.fzf/shell/completion.zsh ]]; then
         source ~/.fzf/shell/completion.zsh
     fi
