@@ -46,13 +46,11 @@ export TRUNCATE_PROMPT=1  # Enable truncated paths (e.g., ~/…/bar/baz)
 
 ## NixOS Support
 
-NixOS users have native declarative configuration via Nix flakes. Two modes are supported:
+NixOS users have native declarative configuration via Nix flakes. Dotfiles are sourced from the Nix store for full reproducibility.
 
-### Mode 1: Declarative (Recommended for NixOS)
+For live editing on NixOS, use `install.sh` instead (it works on NixOS too).
 
-Fully declarative - dotfiles sourced from Nix store, no git clone needed. Perfect for reproducible systems.
-
-#### Installation
+### Installation
 
 1. Add to `/etc/nixos/flake.nix`:
 ```nix
@@ -69,16 +67,16 @@ Fully declarative - dotfiles sourced from Nix store, no git clone needed. Perfec
 
   outputs = { self, nixpkgs, dotfiles, ... }: {
     nixosConfigurations.yourhostname = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
+      system = "x86_64-linux";  # or "aarch64-linux"
       modules = [
         ./configuration.nix
         dotfiles.nixosModules.default
         {
           programs.zsh-dotfiles = {
             enable = true;
+            dotfilesSource = dotfiles;  # Pass the flake input
             users.yourusername = {
               enable = true;
-              # useDeclarative = true;  # Default when dotfiles input is available
 
               # Optional: NixOS-specific configuration
               extraConfig = ''
@@ -114,7 +112,7 @@ sudo nixos-rebuild switch --flake /etc/nixos
 
 4. Done! Your shell is configured. Dotfiles were fetched from GitHub automatically.
 
-#### Updating Dotfiles
+### Updating Dotfiles
 
 ```bash
 # Update to latest version
@@ -129,71 +127,18 @@ sudo nixos-rebuild switch --flake .
 
 This is equivalent to `git pull` on traditional systems.
 
-### Mode 2: Local Clone (Compatible with Traditional Linux)
-
-Use when you want to edit dotfiles locally or need compatibility with non-NixOS systems.
-
-#### Installation
-
-1. Clone dotfiles:
-```bash
-git clone https://github.com/yourusername/dotfiles ~/.dotfiles
-```
-
-2. Add to `/etc/nixos/flake.nix`:
-```nix
-{
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    dotfiles.url = "path:/home/yourusername/.dotfiles";
-  };
-
-  outputs = { self, nixpkgs, dotfiles, ... }: {
-    nixosConfigurations.yourhostname = nixpkgs.lib.nixosSystem {
-      modules = [
-        ./configuration.nix
-        dotfiles.nixosModules.default
-        {
-          programs.zsh-dotfiles = {
-            enable = true;
-            users.yourusername = {
-              enable = true;
-              useDeclarative = false;  # Use local clone
-              dotfilesPath = "/home/yourusername/.dotfiles";
-            };
-          };
-        }
-      ];
-    };
-  };
-}
-```
-
-3. Rebuild:
-```bash
-sudo nixos-rebuild switch --flake /etc/nixos
-```
-
-#### Updating Dotfiles
-
-```bash
-cd ~/.dotfiles
-git pull
-exec zsh  # Reload shell
-```
-
 ### Configuration Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `enable` | bool | false | Enable dotfiles for this user |
-| `useDeclarative` | bool | auto | Use Nix store mode (true) or local clone (false). Auto-detects based on flake input. |
-| `dotfilesPath` | string | `~/.dotfiles` | Path to local clone (local mode only) |
-| `extraConfig` | lines | "" | NixOS-specific zsh config (loaded after dotfiles, before ~/.zshrc.local) |
+| `enable` | bool | false | Enable the zsh-dotfiles module |
+| `dotfilesSource` | path | (required) | The flake input for dotfiles |
+| `users.<name>.enable` | bool | false | Enable dotfiles for this user |
+| `users.<name>.extraConfig` | lines | "" | NixOS-specific zsh config (loaded after dotfiles, before ~/.zshrc.local) |
 
 ### Configuration Layers
 
-When using declarative mode, configuration is loaded in this order:
+Configuration is loaded in this order:
 
 1. **Dotfiles** (from Nix store, immutable) - Generic shell config
 2. **extraConfig** (from NixOS config, declarative) - Machine-specific settings
@@ -214,20 +159,20 @@ Example of where settings belong:
 On NixOS, packages and plugins are managed declaratively:
 - **Packages**: zsh, fzf, zoxide, fd, git installed via Nix
 - **Plugins**: fzf-tab, autosuggestions, syntax-highlighting from nixpkgs (no git clones)
-- **Core config**: Your `core/*.zsh` files (from Nix store or local clone)
-- **Updates**: `nix flake update` (declarative) or `git pull` (local)
+- **Core config**: Your `core/*.zsh` files from Nix store
+- **Updates**: `nix flake update`
 
 ### Comparison Table
 
-| Aspect | Traditional Linux | NixOS Declarative | NixOS Local Clone |
-|--------|------------------|-------------------|-------------------|
-| Package install | `apt/apk/pacman` | Declarative in flake | Declarative in flake |
-| Plugin install | Git clone to `~/.zsh/` | Via nixpkgs | Via nixpkgs |
+| Aspect | Traditional Linux | NixOS (Flake) | NixOS (install.sh) |
+|--------|------------------|---------------|-------------------|
+| Package install | `apt/apk/pacman` | Declarative in flake | Manual |
+| Plugin install | Git clone to `~/.zsh/` | Via nixpkgs | Git clone |
 | Dotfiles location | `~/.dotfiles` (git) | Nix store (immutable) | `~/.dotfiles` (git) |
 | Update command | `git pull` | `nix flake update` | `git pull` |
-| Fresh system setup | Clone + install.sh | Just rebuild | Clone + rebuild |
+| Fresh system setup | Clone + install.sh | Just rebuild | Clone + install.sh |
 | Live editing | Yes | No (need rebuild) | Yes |
-| Reproducibility | Manual | Full | Partial |
+| Reproducibility | Manual | Full | Manual |
 
 ### Troubleshooting
 

@@ -11,7 +11,7 @@ A simple, modular zsh configuration system that's easy to understand and extend.
 - FZF integration - Fuzzy finding for history, files, and directories (optional)
 - Zoxide - Smart directory jumping based on frecency (optional)
 - Machine-specific overrides - Local customizations without affecting shared config
-- Cross-platform - Works on Debian, Ubuntu, Alpine, and Arch Linux
+- Cross-platform - Works on Debian, Ubuntu, Alpine, Arch Linux, and NixOS
 
 ## Quick Start
 
@@ -32,7 +32,39 @@ chsh -s $(which zsh)
 exec zsh
 ```
 
-Installation on new machine:
+## NixOS Installation
+
+Add to your `/etc/nixos/flake.nix`:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    dotfiles.url = "github:yourusername/dotfiles";
+  };
+
+  outputs = { self, nixpkgs, dotfiles, ... }: {
+    nixosConfigurations.yourhostname = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";  # or "aarch64-linux"
+      modules = [
+        ./configuration.nix
+        dotfiles.nixosModules.default
+        {
+          programs.zsh-dotfiles = {
+            enable = true;
+            dotfilesSource = dotfiles;
+            users.yourusername.enable = true;
+          };
+        }
+      ];
+    };
+  };
+}
+```
+
+Rebuild: `sudo nixos-rebuild switch --flake /etc/nixos`
+
+See CLAUDE.md for detailed options and troubleshooting.
 
 ```bash
 # Clone and install

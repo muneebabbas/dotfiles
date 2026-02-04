@@ -7,15 +7,16 @@
 
   outputs = { self, nixpkgs }:
     let
-      system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
+      # Support both x86_64 and aarch64 Linux systems
+      supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
+      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
     in
     {
       # NixOS module for user-specific zsh dotfiles
-      # Pass self so module can reference dotfiles from Nix store
-      nixosModules.default = import ./modules/zsh-dotfiles.nix { dotfilesSource = self; };
+      # Uses standard module signature - dotfilesSource is passed as an option
+      nixosModules.default = ./modules/zsh-dotfiles.nix;
 
-      # Optional: formatter for nix fmt
-      formatter.${system} = pkgs.nixpkgs-fmt;
+      # Formatter for nix fmt (available on all supported systems)
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixpkgs-fmt);
     };
 }

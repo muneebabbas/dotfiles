@@ -222,6 +222,22 @@ main() {
     print_info "Installation directory: $DOTFILES_DIR"
     echo
 
+    # Detect NixOS and provide guidance
+    if [ -f /etc/os-release ] && grep -q "^ID=nixos" /etc/os-release; then
+        print_warning "NixOS detected!"
+        print_info "Recommended: Use the Nix flake for declarative configuration"
+        print_info "See CLAUDE.md for NixOS setup instructions"
+        print_info "Alternative: Continue with this script for traditional symlink setup"
+        echo
+        read -p "Continue with traditional install? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            print_info "Exiting. See CLAUDE.md for NixOS flake instructions."
+            exit 0
+        fi
+        echo
+    fi
+
     # All steps are idempotent - safe to run multiple times
     make_scripts_executable
     migrate_existing_zshrc
