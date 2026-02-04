@@ -65,11 +65,13 @@ in
     enable = mkEnableOption "modular zsh dotfiles configuration";
 
     # The path to the dotfiles source (the flake input)
-    # This is required when enable = true
+    # Required when enable = true
     dotfilesSource = mkOption {
-      type = types.path;
+      type = types.nullOr types.path;
+      default = null;
       description = ''
         Path to the dotfiles source. Pass the flake input here.
+        Required when enable = true.
         Example: dotfilesSource = dotfiles;  # where dotfiles is your flake input
       '';
       example = "dotfiles";
@@ -107,6 +109,15 @@ in
 
   # mkIf makes this entire config block conditional on cfg.enable being true
   config = mkIf cfg.enable {
+    # Assertions validate configuration before building
+    # This ensures dotfilesSource is set when the module is enabled
+    assertions = [
+      {
+        assertion = cfg.dotfilesSource != null;
+        message = "programs.zsh-dotfiles.dotfilesSource must be set when enable = true. Pass your dotfiles flake input.";
+      }
+    ];
+
     # Install required packages system-wide
     environment.systemPackages = with pkgs; [
       zsh
