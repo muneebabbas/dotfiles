@@ -13,13 +13,19 @@ if command -v fzf &>/dev/null; then
     fi
 
     # Source FZF key bindings
-    # Priority: $FZF_BASE (set by NixOS/package managers) > common system paths > manual install
+    # Priority: $FZF_BASE (set by NixOS/package managers) > common system paths > Homebrew > manual install
     if [[ -n "$FZF_BASE" && -f "$FZF_BASE/key-bindings.zsh" ]]; then
         source "$FZF_BASE/key-bindings.zsh"
     elif [[ -f /usr/share/fzf/key-bindings.zsh ]]; then
         source /usr/share/fzf/key-bindings.zsh
     elif [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
         source /usr/share/doc/fzf/examples/key-bindings.zsh
+    elif [[ -f /home/linuxbrew/.linuxbrew/opt/fzf/shell/key-bindings.zsh ]]; then
+        source /home/linuxbrew/.linuxbrew/opt/fzf/shell/key-bindings.zsh
+    elif [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
+        source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
+    elif [[ -f /usr/local/opt/fzf/shell/key-bindings.zsh ]]; then
+        source /usr/local/opt/fzf/shell/key-bindings.zsh
     elif [[ -f ~/.fzf/shell/key-bindings.zsh ]]; then
         source ~/.fzf/shell/key-bindings.zsh
     fi
@@ -31,6 +37,12 @@ if command -v fzf &>/dev/null; then
         source /usr/share/fzf/completion.zsh
     elif [[ -f /usr/share/doc/fzf/examples/completion.zsh ]]; then
         source /usr/share/doc/fzf/examples/completion.zsh
+    elif [[ -f /home/linuxbrew/.linuxbrew/opt/fzf/shell/completion.zsh ]]; then
+        source /home/linuxbrew/.linuxbrew/opt/fzf/shell/completion.zsh
+    elif [[ -f /opt/homebrew/opt/fzf/shell/completion.zsh ]]; then
+        source /opt/homebrew/opt/fzf/shell/completion.zsh
+    elif [[ -f /usr/local/opt/fzf/shell/completion.zsh ]]; then
+        source /usr/local/opt/fzf/shell/completion.zsh
     elif [[ -f ~/.fzf/shell/completion.zsh ]]; then
         source ~/.fzf/shell/completion.zsh
     fi
